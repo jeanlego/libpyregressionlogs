@@ -18,7 +18,7 @@ from libparselog.utils import (
     load_csv,
 )
 
-from libparselog.driver import ParseDriver
+from libparselog.parsedriver import ParseDriver
 
 _LEN = 38
 
@@ -140,48 +140,6 @@ def parse(driver, file_list, as_csv=False):
     dump_tbl(driver, parsed_files, as_csv)
 
 
-def do_diff(
-    driver,
-    golden_tbl,
-    tbl,
-):
-    diff = OrderedDict()
-
-    # generate the diff table
-    for entry in set(list(golden_tbl.keys()) + list(tbl.keys())):
-        diff[entry] = OrderedDict()
-        diff[entry]["__STATUS__"] = "Ok"
-        diff[entry]["__ENTRIES__"] = OrderedDict()
-
-        for header in driver.get_header_list():
-            diff[entry]["__ENTRIES__"][header] = OrderedDict()
-            diff[entry]["__ENTRIES__"][header]["__GOT__"] = None
-            diff[entry]["__ENTRIES__"][header]["__EXPECTED__"] = None
-            diff[entry]["__ENTRIES__"][header]["__STATUS__"] = "Ok"
-
-            if entry not in golden_tbl:
-                diff[entry]["__STATUS__"] = "New"
-                diff[entry]["__ENTRIES__"][header]["__STATUS__"] = "New"
-            elif header in golden_tbl[entry]:
-                diff[entry]["__ENTRIES__"][header]["__EXPECTED__"] = golden_tbl[entry][header]
-
-            if entry not in tbl:
-                diff[entry]["__STATUS__"] = "Missing"
-                diff[entry]["__ENTRIES__"][header]["__STATUS__"] = "Missing"
-            elif entry in tbl and header in tbl[entry]:
-                diff[entry]["__ENTRIES__"][header]["__GOT__"] = tbl[entry][header]
-
-            if not driver.compare(
-                header,
-                diff[entry]["__ENTRIES__"][header]["__GOT__"],
-                diff[entry]["__ENTRIES__"][header]["__EXPECTED__"],
-            ):
-                diff[entry]["__STATUS__"] = "Failed"
-                diff[entry]["__ENTRIES__"][header]["__STATUS__"] = "Failed"
-
-    return diff
-
-
 def compare(
     driver,
     golden_result_file_name,
@@ -193,9 +151,9 @@ def compare(
 ):
     # load toml
     failure_count = 0
-    golden_tbl = load_into_tbl(driver, golden_result_file_name)
-    tbl = load_into_tbl(driver, result_file_name)
-    diff = do_diff(driver, golden_tbl, tbl)
+    expected = load_into_tbl(driver, golden_result_file_name)
+    got = load_into_tbl(driver, result_file_name)
+    diff = driver.do_diff(expected, got)
     diff_tbl = OrderedDict()
     for entry in diff:
         diff_tbl[entry] = OrderedDict()
@@ -346,7 +304,9 @@ def main():
         print(parser.print_help(), file=sys.stderr)
         return -1
 
-    driver = ParseDriver(args.conf, args.import_file, args.preprocess_fn, args.process_fn, args.postprocess_fn)
+    driver = ParseDriver(
+        args.conf, args.import_file, args.preprocess_fn, args.process_fn, args.postprocess_fn
+    )
 
     if args.action == "compare":
         if len(args.file_list) != 3:

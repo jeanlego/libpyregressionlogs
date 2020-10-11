@@ -42,6 +42,7 @@ def unload_list(tbl: OrderedDict, entry: str) -> list:
         del tbl[entry]
     return entries
 
+
 def strip_str(value_str):
     value_str.strip()
     while (value_str.startswith("'") and value_str.endswith("'")) or (
@@ -101,6 +102,7 @@ def sanitize_value(value):
 
     print("Invalid data type for comparison")
     sys.exit(255)
+
 
 def dump_csv(driver, output_dict, file=sys.stdout):
     # dump csv to stdout
@@ -180,7 +182,7 @@ def load_fn_table(file_list):
             file_name = os.path.basename(file_list)
 
             # strip the extension
-            ext_split = file_name.rsplit(".",1)
+            ext_split = file_name.rsplit(".", 1)
             if len(ext_split[0]) > 0:
                 file_name = ext_split[0]
 
@@ -199,3 +201,14 @@ def load_fn_table(file_list):
             for files in file_list:
                 function_table.update(load_fn_table(files))
     return function_table
+
+def assertion(condition: bool, message: str):
+    """[summary]
+
+    Args:
+        condition (bool): [description]
+        message (str): [description]
+    """
+    if not condition:
+        print("Assertion failed:" + message)
+        sys.exit(255)

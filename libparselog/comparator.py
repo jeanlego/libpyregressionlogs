@@ -17,20 +17,20 @@ class Comparator:
     def __init__(self, fn_table=None):
         self.fn_tbl = fn_table
 
-    def _compare_values(self, comparator_name, conf, expected, got):
+    def _compare_values(self, comparator_fn, compare_args, expected, got):
         # convert to a number if possible
         expected = sanitize_value(expected)
         got = sanitize_value(got)
 
-        if comparator_name in self.fn_tbl:
-            return self.fn_tbl[comparator_name](conf, expected, got)
+        if comparator_fn in self.fn_tbl:
+            return self.fn_tbl[comparator_fn](compare_args, expected, got)
         else:
-            print("ERROR: unable to find " + comparator_name)
+            print("ERROR: unable to find " + comparator_fn)
             sys.exit(255)
 
         return False
 
-    def compare(self, comparator_name, conf, expected, got):
+    def compare(self, comparator_fn, compare_args, expected, got):
         if got is None and expected is None:
             return True
 
@@ -43,7 +43,7 @@ class Comparator:
                 return False
 
             for (got_item, expected_item) in zip(got, expected):
-                if not self._compare_values(comparator_name, conf, got_item, expected_item):
+                if not self._compare_values(comparator_fn, compare_args, expected_item, got_item):
                     return False
 
             return True
@@ -51,4 +51,4 @@ class Comparator:
         if isinstance(got, list) or isinstance(expected, list):
             return False
 
-        return self._compare_values(comparator_name, conf, got, expected)
+        return self._compare_values(comparator_fn, compare_args, expected, got)

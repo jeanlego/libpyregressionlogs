@@ -7,46 +7,6 @@
 # keep the ordering from the toml
 from collections import OrderedDict
 
-# your function name must be loaded as a string in PRE_HOOKS= [] within your file
-def _preprocess_fn(input_file, output_file) -> None:
-    """This is a minimaly working example of a working log parser preprocessing hook
-
-    Args:
-        input (File_obj):
-            the input file that is open as read only,
-        output (File_obj):
-            the temporary file opened to write back the processed input
-    """
-
-    for line in input_file:
-        print(line, file=output_file)
-
-
-# your function name must be loaded as a string in INLINE_HOOKS= [] within your file
-def _process_fn(line_in: str) -> str:
-    """This is a minimaly working example of a working log parser inline processing hook
-
-    Args:
-        line_in (str): the current line being read by the log processor
-
-    Returns:
-        str: the line to pass back to the log parser
-    """
-    return line_in
-
-
-# your function name must be loaded as a string in POST_HOOKS= [] within your file
-def postprocess_fn(dataset: OrderedDict) -> OrderedDict:
-    """This is a minimaly working example of a working log parser postprocessing hook
-
-    Args:
-        dataset (OrderedDict): the input dataset to reorganize
-
-    Returns:
-        OrderedDict: the reodered dataset
-    """
-    return dataset
-
 
 class Hooks:
     """[summary]

@@ -7,7 +7,8 @@
 # keep the ordering from the toml
 from collections import OrderedDict
 
-# your function name must be loaded as a string in PRE_HOOKS= [] within your file
+# The file containing this function must be loaded in import = [] within DRIVER header in toml
+# your function name must be loaded as a string in preprocess = [] within DRIVER header in toml
 def _preprocessor_function(input_file, output_file) -> None:
     """This is a minimaly working example of a working log parser preprocessing hook
 
@@ -21,8 +22,8 @@ def _preprocessor_function(input_file, output_file) -> None:
     for line in input_file:
         print(line, file=output_file)
 
-
-# your function name must be loaded as a string in INLINE_HOOKS= [] within your file
+# The file containing this function must be loaded in import = [] within DRIVER header in toml
+# your function name must be loaded as a string in process = [] within DRIVER header in toml
 def _processor_function(line_in: str) -> str:
     """This is a minimaly working example of a working log parser inline processing hook
 
@@ -34,8 +35,8 @@ def _processor_function(line_in: str) -> str:
     """
     return line_in
 
-
-# your function name must be loaded as a string in POST_HOOKS= [] within your file
+# The file containing this function must be loaded in import = [] within DRIVER header in toml
+# your function name must be loaded as a string in postprocess = [] within DRIVER header in toml
 def postprocessor_function(dataset: OrderedDict) -> OrderedDict:
     """This is a minimaly working example of a working log parser postprocessing hook
 
@@ -47,15 +48,18 @@ def postprocessor_function(dataset: OrderedDict) -> OrderedDict:
     """
     return dataset
 
-def compare_equals(_conf: OrderedDict, expected, got) -> bool:
+# The file containing this function must be loaded in import = [] within DRIVER header in toml
+def compare_equals(_compare_args: OrderedDict, expected, got) -> bool:
     """Will verify the equality between two values
+    the value types are undetermined, and as such the comparator must handle this
 
     Args:
-        _conf (OrderedDict): is the TOML configuration
-        dataset (OrderedDict): the input dataset to reorganize
+        _compare_args (OrderedDict): is the arguments stored under the [$current_header]["compare"][$function_name] entry
+        expected (undetermined): the input dataset to compare
+        got (undetermined): the input dataset to compare
 
     Returns:
-        bool: if the values are equivalen
+        bool: if the values are equivalent
     """
 
     # short circuit
